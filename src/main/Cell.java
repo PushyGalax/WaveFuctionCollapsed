@@ -2,6 +2,7 @@ package main;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class Cell {
     // VARIABLES
@@ -69,10 +70,6 @@ public class Cell {
         return this.type;
     }
 
-    public ArrayList<Integer> getPossibleType() {
-        return this.possibleType;
-    }
-
     public boolean isCollapsed() {
         return this.collapsed;
     }
@@ -101,7 +98,7 @@ public class Cell {
         this.collapsed = true;
     }
 
-    public void collapsed(ArrayList<Cell> neipo) {
+    public void collapsed(List<Cell> neipo) {
         ArrayList<Integer> newPossibleTypes = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5));
         for (Cell c : neipo) {
             int type = c.getType();

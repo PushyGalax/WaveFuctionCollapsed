@@ -16,13 +16,13 @@ public class renderEnvironnement {
     private int tileSize = 5;
     private int cameraX = 0;
     private int cameraY = 0;
-    private Map<Point, Integer> imagePositions = new HashMap<>();
+    private final Map<Point, Integer> imagePositions = new HashMap<>();
     private BufferStrategy bufferStrategy;
 
     public void render() {
         frame = new Frame("Environment Rendering");
         frame.setSize(800, 600);
-        frame.setBackground(Color.BLUE);
+        frame.setBackground(Color.BLACK);
         frame.setLayout(new BorderLayout());
 
         canvas = new Canvas();
@@ -61,6 +61,15 @@ public class renderEnvironnement {
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         for (int i = 0; i < images.length; i++) {
             images[i] = toolkit.getImage("C:\\Users\\galax\\Desktop\\java\\WaveFunctionCollapsed\\res\\img\\" + i + ".png");
+
+            // Pre-load image to avoid delays during rendering
+            MediaTracker tracker = new MediaTracker(canvas);
+            tracker.addImage(images[i], 0);
+            try {
+                tracker.waitForAll();
+            } catch (InterruptedException e) {
+                System.out.println("Image loading interrupted: " + e.getMessage());
+            }
         }
     }
 
@@ -68,32 +77,73 @@ public class renderEnvironnement {
         if (type < 0 || type >= images.length || images[type] == null) {
             return;
         }
-        imagePositions.put(new Point(x, y), type);
+        synchronized (imagePositions) {
+            imagePositions.put(new Point(x, y), type);
+        }
         drawAllImages();
     }
 
-    private void drawAllImages() {
+    private long lastRenderTime = 0;
+
+    private void clearBuffer(Graphics g) {
+        g.setColor(Color.BLACK); // Définit la couleur de fond (noir dans ce cas)
+        g.fillRect(0, 0, canvas.getWidth(), canvas.getHeight()); // Remplit tout le canvas
+    }
+
+    private Map<Integer, Image[]> scaledImageCache = new HashMap<>();
+
+    private Image[] getScaledImages() {
+        // Si des images mises en cache existent déjà pour cette taille de tuile, on les retourne
+        if (scaledImageCache.containsKey(tileSize)) {
+            return scaledImageCache.get(tileSize);
+        }
+
+        // Sinon, on redimensionne les images et les met en cache
+        Image[] scaledImages = new Image[images.length];
+        for (int i = 0; i < images.length; i++) {
+            if (images[i] != null) {
+                scaledImages[i] = images[i].getScaledInstance(
+                        images[i].getWidth(canvas) * tileSize, // Nouvelle largeur
+                        images[i].getHeight(canvas) * tileSize, // Nouvelle hauteur
+                        Image.SCALE_SMOOTH // Utilise un algorithme de redimensionnement de haute qualité
+                );
+            }
+        }
+        scaledImageCache.put(tileSize, scaledImages); // Mise en cache des images redimensionnées
+        return scaledImages;
+    }
+
+        private void drawAllImages() {
+        long currentTime = System.nanoTime();
+        if ((currentTime - lastRenderTime) < 16_666_667) { // 16ms for ~60FPS
+            return;
+        }
+        lastRenderTime = currentTime;
+
         do {
             do {
                 Graphics g = bufferStrategy.getDrawGraphics();
                 clearBuffer(g);
-                for (Map.Entry<Point, Integer> entry : imagePositions.entrySet()) {
+
+                Map<Point, Integer> positionsCopy;
+                synchronized (imagePositions) {
+                    positionsCopy = new HashMap<>(imagePositions);
+                }
+                Image[] scaledImages = getScaledImages();
+
+                for (Map.Entry<Point, Integer> entry : positionsCopy.entrySet()) {
                     Point position = entry.getKey();
                     int type = entry.getValue();
                     int drawX = (position.x - cameraX) * tileSize;
                     int drawY = (position.y - cameraY) * tileSize;
-                    if (type >= 0 && type < images.length && images[type] != null) {
-                        g.drawImage(images[type], drawX, drawY, images[type].getWidth(canvas) * tileSize, images[type].getHeight(canvas) * tileSize, canvas);
+                    if (type >= 0 && type < scaledImages.length && scaledImages[type] != null) {
+                        g.drawImage(scaledImages[type], drawX, drawY, canvas);
                     }
                 }
+
                 g.dispose();
             } while (bufferStrategy.contentsRestored());
             bufferStrategy.show();
         } while (bufferStrategy.contentsLost());
-    }
-
-    private void clearBuffer(Graphics g) {
-        g.setColor(Color.BLACK);
-        g.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
     }
 }
