@@ -60,7 +60,7 @@ public class renderEnvironnement {
     private void loadImages() {
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         for (int i = 0; i < images.length; i++) {
-            images[i] = toolkit.getImage("C:\\Users\\galax\\Desktop\\java\\WaveFunctionCollapsed\\res\\img\\" + i + ".png");
+            images[i] = toolkit.getImage("res\\img\\" + i + ".png");
         }
     }
 
