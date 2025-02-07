@@ -1,5 +1,7 @@
 package completed;
 
+import java.util.ArrayList;
+
 public class Main {
     public static void main(String[] args) {
 //        int[] pix1 = {0, 0, 0};
@@ -18,5 +20,8 @@ public class Main {
 
         TileGenerator tg = new TileGenerator("res/samples/City.png", 3, 3);
         tg.loadImages();
+        ArrayList<Tile> tiles = tg.getTiles();
+
+        Environment env = new Environment(600, 600, tiles);
     }
 }

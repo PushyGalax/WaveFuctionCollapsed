@@ -10,6 +10,11 @@ public class Tile {
     // VARIABLES
     private ArrayList<ArrayList> tile;
     private int occurence;
+    private int id;
+    private ArrayList<Integer> possibilityUp;
+    private ArrayList<Integer> possibilityDown;
+    private ArrayList<Integer> possibilityLeft;
+    private ArrayList<Integer> possibilityRight;
 
 
     // CONSTRUCTORS
@@ -35,6 +40,10 @@ public class Tile {
         tile.add(row3);
 
         this.occurence = 0;
+        this.possibilityUp = new ArrayList<>();
+        this.possibilityDown = new ArrayList<>();
+        this.possibilityLeft = new ArrayList<>();
+        this.possibilityRight = new ArrayList<>();
     }
 
     // METHODS
@@ -67,5 +76,57 @@ public class Tile {
 
     public void increaseOccurence() {
         this.occurence++;
+    }
+
+    public void setId(int i) {
+        this.id = i;
+    }
+
+    public int getId() {
+        return this.id;
+    }
+
+    public void addPossibilityUp(int id) {
+        this.possibilityUp.add(id);
+    }
+
+    public void addPossibilityDown(int id) {
+        this.possibilityDown.add(id);
+    }
+
+    public void addPossibilityLeft(int id) {
+        this.possibilityLeft.add(id);
+    }
+
+    public void addPossibilityRight(int id) {
+        this.possibilityRight.add(id);
+    }
+
+    public ArrayList<Integer> getPossibilityUp() {
+        return this.possibilityUp;
+    }
+
+    public ArrayList<Integer> getPossibilityDown() {
+        return this.possibilityDown;
+    }
+
+    public ArrayList<Integer> getPossibilityLeft() {
+        return this.possibilityLeft;
+    }
+
+    public ArrayList<Integer> getPossibilityRight() {
+        return this.possibilityRight;
+    }
+
+    public ArrayList<ArrayList> getLine(int i) {
+        return tile.get(i);
+    }
+
+    public ArrayList<ArrayList<Integer>> getRow(int i) {
+        ArrayList<ArrayList<Integer>> row = new ArrayList<>();
+        for (int j = 0; j < 3; j++) {
+            row.add((ArrayList<Integer>) tile.get(j).get(i));
+        }
+        return row;
     }
 }

@@ -52,23 +52,40 @@ public class TileGenerator {
         //System.out.println(this.imgWidth);
 
         generateTile();
-        System.out.println(tiles.size());
         clearTiles();
-        System.out.println(tiles.size());
-        clearTiles();
-        System.out.println(tiles.size());
-
-        test();
+        makeId();
+        makePossibility();
     }
 
-    private void test() {
-        boolean testing = false;
+    public ArrayList<Tile> getTiles() {
+        return tiles;
+    }
+
+    public boolean getTest() {
+        return test();
+    }
+
+    private boolean test() {
+        boolean noDuplicates = true;
+        boolean allHaveId = true;
+        boolean allPossibilitiesFinished = true;
+
         for (int i = 0; i < tiles.size(); i++) {
-            for (int j = 0; j<tiles.size(); j++) {
-                if (tiles.get(i).equals(tiles.get(j))) testing = true;
+            Tile tile = tiles.get(i);
+            if (tile.getId() == -1) {
+                allHaveId = false;
+            }
+            if (tile.getPossibilityUp().isEmpty() || tile.getPossibilityDown().isEmpty() || tile.getPossibilityLeft().isEmpty() || tile.getPossibilityRight().isEmpty()) {
+                allPossibilitiesFinished = false;
+            }
+            for (int j = i + 1; j < tiles.size(); j++) {
+                if (tiles.get(i).equals(tiles.get(j))) {
+                    noDuplicates = false;
+                }
             }
         }
-        System.out.println(testing);
+
+        return noDuplicates && allHaveId && allPossibilitiesFinished;
     }
 
 
@@ -123,46 +140,6 @@ public class TileGenerator {
     }
 
     private void generateTile() {
-//        for (int line = 0; line < this.imgHeight; line++) {
-//            for (int rows = 0; rows < this.imgWidth; rows++) {
-//                ArrayList<ArrayList<Integer>> ligne = pixelMatrix.get(line);
-//                ArrayList<Integer> color = ligne.get(rows);
-//                String printColor = "";
-//                for (int elem : color) {
-//                    printColor = printColor + elem + " ";
-//                }
-//                //System.out.println(printColor);
-//            }
-//        }
-
-//        int line = 0;  // dividende de i par imgWidth
-//        int row = 0;  // useles
-//        for (int i = 0; i<(this.imgHeight*this.imgWidth);i++) {
-//
-//
-//            int Cordpix1=i;
-//            int Cordpix2=(((i+1)%this.imgWidth)+(line*this.imgWidth));
-//            int Cordpix3=((i+2)%this.imgWidth)+(line*this.imgWidth);
-//            int Cordpix4=((i % this.imgWidth) + ((line+1)*this.imgWidth)) % (this.imgWidth*this.imgHeight);
-//            int Cordpix5=(((i+1) % this.imgWidth) + ((line+1)*this.imgWidth)) % (this.imgWidth*this.imgHeight);
-//            int Cordpix6=(((i+2) % this.imgWidth) + ((line+1)*this.imgWidth)) % (this.imgWidth*this.imgHeight);
-//            int Cordpix7=((i % this.imgWidth) + ((line+2)*this.imgWidth)) % (this.imgWidth*this.imgHeight);
-//            int Cordpix8=(((i+1) % this.imgWidth) + ((line+2)*this.imgWidth)) % (this.imgWidth*this.imgHeight);
-//            int Cordpix9=(((i+2) % this.imgWidth) + ((line+2)*this.imgWidth)) % (this.imgWidth*this.imgHeight);
-//
-//            if (i%this.imgWidth == 0) line++;
-//
-//            System.out.print(Cordpix1 +" ");
-//            System.out.print(Cordpix2 +" ");
-//            System.out.print(Cordpix3 +" ");
-//            System.out.print(Cordpix4 +" ");
-//            System.out.print(Cordpix5 +" ");
-//            System.out.print(Cordpix6 +" ");
-//            System.out.print(Cordpix7 +" ");
-//            System.out.print(Cordpix8 +" ");
-//            System.out.println(Cordpix9);
-//        }
-
         for (int line = 0; line<this.imgHeight;line++) {
             for (int row = 0; row<this.imgWidth; row++) {
                 Tile tile;
@@ -203,5 +180,69 @@ public class TileGenerator {
             }
         }
         tiles = tilesClear;
+    }
+
+    private void makeId() {
+        for (int i = 0; i < tiles.size(); i++) {
+            tiles.get(i).setId(i);
+        }
+    }
+
+    private boolean isOverlappingUp(Tile tile1, Tile tile2) {
+        boolean result = false;
+        if (tile1.getLine(1).equals(tile2.getLine(0)) && tile1.getLine(2).equals(tile2.getLine(1))) {
+            result = true;
+        }
+        return result;
+    }
+
+    private boolean isOverlappingDown(Tile tile1, Tile tile2) {
+        boolean result = false;
+        if (tile1.getLine(0).equals(tile2.getLine(1)) && tile1.getLine(1).equals(tile2.getLine(2))) {
+            result = true;
+        }
+        return result;
+    }
+
+    private boolean isOverlappingLeft(Tile tile1, Tile tile2) {
+        boolean result = false;
+        if (tile1.getRow(1).equals(tile2.getRow(0)) && tile1.getRow(2).equals(tile2.getRow(1))) {
+            result = true;
+        }
+        return result;
+    }
+
+    private boolean isOverlappingRight(Tile tile1, Tile tile2) {
+        boolean result = false;
+        if (tile1.getRow(0).equals(tile2.getRow(1)) && tile1.getRow(1).equals(tile2.getRow(2))) {
+            result = true;
+        }
+        return result;
+    }
+
+
+    private void makePossibility() {
+        for (int i = 0; i < tiles.size(); i++) {
+            Tile inWork = tiles.get(i);
+            for (int j = 0; j < tiles.size(); j++) {
+                Tile check = tiles.get(j);
+                //UP
+                if (isOverlappingUp(inWork, check)) {
+                    inWork.addPossibilityUp(check.getId());
+                }
+                //DOWN
+                if (isOverlappingDown(inWork, check)) {
+                    inWork.addPossibilityDown(check.getId());
+                }
+                //LEFT
+                if (isOverlappingLeft(inWork, check)) {
+                    inWork.addPossibilityLeft(check.getId());
+                }
+                //RIGHT
+                if (isOverlappingRight(inWork, check)) {
+                    inWork.addPossibilityRight(check.getId());
+                }
+            }
+        }
     }
 }
