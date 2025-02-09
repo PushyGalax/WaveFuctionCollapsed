@@ -1,6 +1,7 @@
 package completed;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 public class Tile {
     /**
@@ -128,5 +129,41 @@ public class Tile {
             row.add((ArrayList<Integer>) tile.get(j).get(i));
         }
         return row;
+    }
+
+    public boolean isOverlappingUp(Tile other) {
+        boolean result = false;
+        if (this.getLine(1).equals(other.getLine(0)) && this.getLine(2).equals(other.getLine(1))) {
+            result = true;
+        }
+        return result;
+    }
+
+    public boolean isOverlappingDown(Tile other) {
+        boolean result = false;
+        if (this.getLine(0).equals(other.getLine(1)) && this.getLine(1).equals(other.getLine(2))) {
+            result = true;
+        }
+        return result;
+    }
+
+    public boolean isOverlappingLeft(Tile other) {
+        boolean result = false;
+        if (this.getRow(1).equals(other.getRow(0)) && this.getRow(2).equals(other.getRow(1))) {
+            result = true;
+        }
+        return result;
+    }
+
+    public boolean isOverlappingRight(Tile other) {
+        boolean result = false;
+        if (this.getRow(0).equals(other.getRow(1)) && this.getRow(1).equals(other.getRow(2))) {
+            result = true;
+        }
+        return result;
+    }
+
+    public ArrayList<Integer> getColor() {
+        return (ArrayList<Integer>) tile.get(1).get(1);
     }
 }

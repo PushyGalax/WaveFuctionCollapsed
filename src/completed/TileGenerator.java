@@ -188,58 +188,25 @@ public class TileGenerator {
         }
     }
 
-    private boolean isOverlappingUp(Tile tile1, Tile tile2) {
-        boolean result = false;
-        if (tile1.getLine(1).equals(tile2.getLine(0)) && tile1.getLine(2).equals(tile2.getLine(1))) {
-            result = true;
-        }
-        return result;
-    }
-
-    private boolean isOverlappingDown(Tile tile1, Tile tile2) {
-        boolean result = false;
-        if (tile1.getLine(0).equals(tile2.getLine(1)) && tile1.getLine(1).equals(tile2.getLine(2))) {
-            result = true;
-        }
-        return result;
-    }
-
-    private boolean isOverlappingLeft(Tile tile1, Tile tile2) {
-        boolean result = false;
-        if (tile1.getRow(1).equals(tile2.getRow(0)) && tile1.getRow(2).equals(tile2.getRow(1))) {
-            result = true;
-        }
-        return result;
-    }
-
-    private boolean isOverlappingRight(Tile tile1, Tile tile2) {
-        boolean result = false;
-        if (tile1.getRow(0).equals(tile2.getRow(1)) && tile1.getRow(1).equals(tile2.getRow(2))) {
-            result = true;
-        }
-        return result;
-    }
-
-
     private void makePossibility() {
         for (int i = 0; i < tiles.size(); i++) {
             Tile inWork = tiles.get(i);
             for (int j = 0; j < tiles.size(); j++) {
                 Tile check = tiles.get(j);
                 //UP
-                if (isOverlappingUp(inWork, check)) {
+                if (inWork.isOverlappingUp(check)) {
                     inWork.addPossibilityUp(check.getId());
                 }
                 //DOWN
-                if (isOverlappingDown(inWork, check)) {
+                if (inWork.isOverlappingDown(check)) {
                     inWork.addPossibilityDown(check.getId());
                 }
                 //LEFT
-                if (isOverlappingLeft(inWork, check)) {
+                if (inWork.isOverlappingLeft(check)) {
                     inWork.addPossibilityLeft(check.getId());
                 }
                 //RIGHT
-                if (isOverlappingRight(inWork, check)) {
+                if (inWork.isOverlappingRight(check)) {
                     inWork.addPossibilityRight(check.getId());
                 }
             }
